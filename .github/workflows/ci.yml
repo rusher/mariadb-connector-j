@@ -47,18 +47,18 @@ jobs:
           - tag: '10.5'
             registry: 'docker.mariadb.com/enterprise-server'
             if: github.event_name != 'pull_request'
-            registry-user: ${{ secrets.ENTERPRISE_USER }}
-            registry-password: ${{ secrets.ENTERPRISE_TOKEN }}
+            registry-user: secrets.ENTERPRISE_USER
+            registry-password: secrets.ENTERPRISE_TOKEN
           - tag: '10.6'
             registry: 'docker.mariadb.com/enterprise-server'
             if: github.event_name != 'pull_request'
-            registry-user: ${{ secrets.ENTERPRISE_USER }}
-            registry-password: ${{ secrets.ENTERPRISE_TOKEN }}
+            registry-user: secrets.ENTERPRISE_USER
+            registry-password: secrets.ENTERPRISE_TOKEN
           - tag: '11.4'
             registry: 'docker.mariadb.com/enterprise-server'
             if: github.event_name != 'pull_request'
-            registry-user: ${{ secrets.ENTERPRISE_USER }}
-            registry-password: ${{ secrets.ENTERPRISE_TOKEN }}
+            registry-user: secrets.ENTERPRISE_USER
+            registry-password: secrets.ENTERPRISE_TOKEN
           - tag: '8.0'
             mysql: true
     env:
