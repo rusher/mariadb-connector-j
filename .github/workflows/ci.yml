@@ -46,22 +46,16 @@ jobs:
             tag: '10.5'
             java_version: '21'
             if: github.event_name != 'pull_request'
-            registry_user: ${{ secrets.ENTERPRISE_USER }}
-            registry_password: ${{ secrets.ENTERPRISE_TOKEN }}
 
           - type: 'enterprise'
             tag: '10.6'
             java_version: '21'
             if: github.event_name != 'pull_request'
-            registry_user: ${{ secrets.ENTERPRISE_USER }}
-            registry_password: ${{ secrets.ENTERPRISE_TOKEN }}
 
           - type: 'enterprise'
             tag: '11.4'
             java_version: '21'
             if: github.event_name != 'pull_request'
-            registry_user: ${{ secrets.ENTERPRISE_USER }}
-            registry_password: ${{ secrets.ENTERPRISE_TOKEN }}
 
           - type: 'mysql'
             tag: '8.0'
@@ -90,8 +84,8 @@ jobs:
       - name: Set env
         run: echo "registry=$([ "${{ matrix.type }}" = "community" ] && echo "docker.io/mariadb" || echo "docker.mariadb.com/enterprise-server")" >> $GITHUB_ENV
 
-      - name: Set up MariaDB Server
-        if: ${{ matrix.type != 'mysql' }}
+      - name: Set up MariaDB Community server
+        if: ${{ matrix.type != 'community' }}
         uses: rusher/setup-mariadb@v1.7
         with:
           tag : ${{ matrix.tag }}
@@ -100,8 +94,19 @@ jobs:
           user: ${{ env.TEST_DB_USER }}
           password: ${{ env.TEST_DB_PASSWORD }}
           database: ${{ env.TEST_DB_DATABASE }}
-          registry-user: ${{ matrix.registry_user }}
-          registry-password: ${{ matrix.registry_password }}
+
+      - name: Set up MariaDB Enterprise server
+        if: ${{ matrix.type == 'enterprise'}}
+        uses: rusher/setup-mariadb@v1.7
+        with:
+          tag : ${{ matrix.tag }}
+          registry: ${{ env.registry }}
+          root-password: ${{ env.TEST_DB_PASSWORD }}
+          user: ${{ env.TEST_DB_USER }}
+          password: ${{ env.TEST_DB_PASSWORD }}
+          database: ${{ env.TEST_DB_DATABASE }}
+          registry-user: ${{ secrets.ENTERPRISE_USER }}
+          registry-password: ${{ secrets.ENTERPRISE_TOKEN }}
 
       - name: Set up MySQL Server
         if: ${{ matrix.type == 'mysql' }}
