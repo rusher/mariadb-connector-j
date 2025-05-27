@@ -92,7 +92,7 @@ jobs:
 
       - name: Set up MariaDB Server
         if: ${{ matrix.type != 'mysql' }}
-        uses: rusher/setup-mariadb@v1.5
+        uses: rusher/setup-mariadb@v1.6
         with:
           tag : ${{ matrix.tag }}
           registry: ${{ env.registry }}
