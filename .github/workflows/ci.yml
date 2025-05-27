@@ -34,11 +34,11 @@ jobs:
       matrix:
         java-version: ['21']
         registry: ['docker.io/mariadb']
+        tag: '11.4'
         include:
           - tag: '10.5'
           - tag: '10.6'
           - tag: '10.11'
-          - tag: '11.4'
           - tag: '11.4'
             java-version: '8'
             mvn-profile: 'java8'
@@ -69,6 +69,7 @@ jobs:
       TEST_DB_DATABASE: testj
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
