@@ -20,34 +20,53 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java_version: ['21']
-        type: ['community']
         include:
-          - tag: '10.5'
-          - tag: '10.6'
-          - tag: '10.11'
-          - tag: '11.4'
+          - type: 'community'
+            tag: '10.5'
+            java_version: '21'
+
+          - type: 'community'
+            tag: '10.6'
+            java_version: '21'
+
+          - type: 'community'
+            tag: '10.11'
+            java_version: '21'
+
+          - type: 'community'
+            tag: '11.4'
             java_version: '8'
             mvn_profile: 'java8'
-          - tag: '11.4'
+
+          - type: 'community'
+            tag: '11.4'
             java_version: '17'
-          - tag: '10.5'
-            type: 'enterprise'
+
+          - type: 'enterprise'
+            tag: '10.5'
+            java_version: '21'
             if: github.event_name != 'pull_request'
             registry_user: secrets.ENTERPRISE_USER
             registry_password: secrets.ENTERPRISE_TOKEN
-          - tag: '10.6'
-            type: 'enterprise'
+
+          - type: 'enterprise'
+            tag: '10.6'
+            java_version: '21'
             if: github.event_name != 'pull_request'
             registry_user: secrets.ENTERPRISE_USER
             registry_password: secrets.ENTERPRISE_TOKEN
-          - tag: '11.4'
-            type: 'enterprise'
+
+          - type: 'enterprise'
+            tag: '11.4'
+            java_version: '21'
             if: github.event_name != 'pull_request'
             registry_user: secrets.ENTERPRISE_USER
             registry_password: secrets.ENTERPRISE_TOKEN
-          - tag: '8.0'
-            type: 'mysql'
+
+          - type: 'mysql'
+            tag: '8.0'
+            java_version: '21'
+
     env:
       TEST_DB_HOST: localhost
       TEST_DB_PORT: 3306
