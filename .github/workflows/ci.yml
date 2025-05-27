@@ -82,7 +82,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Set up MariaDB Community server
-        if: ${{ matrix.type != 'community' }}
+        if: ${{ matrix.type == 'community' }}
         uses: rusher/setup-mariadb@v1.9
         with:
           tag : ${{ matrix.tag }}
