@@ -3,121 +3,121 @@ name: Run CI Tests
 
 on:
   push:
-    branches:
-      - 'master'
-      - 'develop'
-      - 'feature/action'
+    branches: ['master', 'develop', 'feature/action']
   pull_request:
-  workflow_dispatch:  # Allows to trigger the workflow manually in GitHub UI
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  TEST_DB_HOST: localhost
+  TEST_DB_PORT: 3306
+  TEST_DB_USER: boby
+  TEST_DB_PASSWORD: 'heyPassw-!*20oRd'
+  TEST_DB_DATABASE: testj
+
 jobs:
-  test:
+  initial-test:
     timeout-minutes: 50
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
           - type: 'community'
-            tag: '10.5'
-            java_version: '21'
-
-          - type: 'community'
             tag: '10.6'
             java_version: '21'
-
-          - type: 'community'
-            tag: '10.11'
-            java_version: '21'
-
-          - type: 'community'
-            tag: '11.4'
-            java_version: '8'
-            mvn_profile: 'java8'
-
-          - type: 'community'
-            tag: '11.4'
-            java_version: '17'
-
-          - type: 'enterprise'
-            tag: '10.5'
-            java_version: '21'
-            if: github.event_name != 'pull_request'
-
           - type: 'enterprise'
             tag: '10.6'
             java_version: '21'
             if: github.event_name != 'pull_request'
-
-          - type: 'enterprise'
-            tag: '11.4'
-            java_version: '21'
-            if: github.event_name != 'pull_request'
-
-          - type: 'mysql'
-            tag: '8.0'
-            java_version: '21'
-
-    env:
-      TEST_DB_HOST: localhost
-      TEST_DB_PORT: 3306
-      TEST_DB_USER: boby
-      TEST_DB_PASSWORD: 'heyPassw-!*20oRd'
-      TEST_DB_DATABASE: testj
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set env
-        run: echo "java_version:${{ matrix.java_version }}"
-
-
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java_version }}
           cache: maven
           distribution: 'adopt'
 
-      - name: Set up MariaDB Community server
-        if: ${{ matrix.type == 'community' }}
+      - name: Setup Database
         uses: rusher/setup-mariadb@v1.9
         with:
-          tag : ${{ matrix.tag }}
+          tag: ${{ matrix.tag }}
           root-password: ${{ env.TEST_DB_PASSWORD }}
           user: ${{ env.TEST_DB_USER }}
           password: ${{ env.TEST_DB_PASSWORD }}
           database: ${{ env.TEST_DB_DATABASE }}
+          registry: ${{ matrix.type == 'enterprise' && 'docker.mariadb.com/enterprise-server' || '' }}
+          registry-user: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_USER || '' }}
+          registry-password: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_TOKEN || '' }}
 
-      - name: Set up MariaDB Enterprise server
-        if: ${{ matrix.type == 'enterprise'}}
+      - name: Run Tests
+        run: mvn clean test
+
+  full-test:
+    timeout-minutes: 50
+    runs-on: ubuntu-latest
+    needs: initial-test
+    strategy:
+      matrix:
+        include:
+          - type: 'community'
+            tag: '10.5'
+            java_version: '21'
+          - type: 'community'
+            tag: '10.11'
+            java_version: '21'
+          - type: 'community'
+            tag: '11.4'
+            java_version: '8'
+            mvn_profile: 'java8'
+          - type: 'community'
+            tag: '11.4'
+            java_version: '17'
+          - type: 'enterprise'
+            tag: '10.5'
+            java_version: '21'
+            if: github.event_name != 'pull_request'
+          - type: 'enterprise'
+            tag: '11.4'
+            java_version: '21'
+            if: github.event_name != 'pull_request'
+          - type: 'mysql'
+            tag: '8.0'
+            java_version: '21'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java_version }}
+          cache: maven
+          distribution: 'adopt'
+
+      - name: Setup MariaDB
+        if: matrix.type != 'mysql'
         uses: rusher/setup-mariadb@v1.9
         with:
-          tag : ${{ matrix.tag }}
+          tag: ${{ matrix.tag }}
           root-password: ${{ env.TEST_DB_PASSWORD }}
           user: ${{ env.TEST_DB_USER }}
           password: ${{ env.TEST_DB_PASSWORD }}
           database: ${{ env.TEST_DB_DATABASE }}
-          registry: "docker.mariadb.com/enterprise-server"
-          registry-user: ${{ secrets.ENTERPRISE_USER }}
-          registry-password: ${{ secrets.ENTERPRISE_TOKEN }}
+          registry: ${{ matrix.type == 'enterprise' && 'docker.mariadb.com/enterprise-server' || '' }}
+          registry-user: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_USER || '' }}
+          registry-password: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_TOKEN || '' }}
 
-      - name: Set up MySQL Server
-        if: ${{ matrix.type == 'mysql' }}
+      - name: Setup MySQL
+        if: matrix.type == 'mysql'
         uses: mirromutth/mysql-action@v1.1
         with:
           mysql version: ${{ matrix.tag }}
           mysql database: ${{ env.TEST_DB_DATABASE }}
-          mysql root password:  ${{ env.TEST_DB_PASSWORD }}
-          mysql user: ${{ matrix.registry_user }}
-          mysql password:  ${{ env.TEST_DB_PASSWORD }}
+          mysql root password: ${{ env.TEST_DB_PASSWORD }}
+          mysql user: ${{ env.TEST_DB_USER }}
+          mysql password: ${{ env.TEST_DB_PASSWORD }}
 
-      - name: Build with Maven java 8
-        if: matrix.mvn_profile == 'java8'
-        run: mvn clean test -P java8
-
-      - name: Build with Maven
-        if: matrix.mvn_profile == ''
-        run: mvn clean test
+      - name: Run Tests
+        run: mvn clean test ${{ matrix.mvn_profile && format('-P {0}', matrix.mvn_profile) || '' }}
