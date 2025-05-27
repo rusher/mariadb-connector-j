@@ -47,7 +47,7 @@ jobs:
             registry-user: secrets.ENTERPRISE_USER
             registry-password: secrets.ENTERPRISE_TOKEN
           - tag: '8.0'
-            mysql: true
+            type: 'mysql'
     env:
       TEST_DB_HOST: localhost
       TEST_DB_PORT: 3306
@@ -72,7 +72,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Set up MariaDB Server
-        if: matrix.mysql == 'true'
+        if: ${{ matrix.type != 'mysql' }}
         uses: rusher/setup-mariadb@v1
         with:
           tag : ${{ matrix.tag }}
