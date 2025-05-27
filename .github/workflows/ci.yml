@@ -72,7 +72,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: matrix.java-version
+          java-version: ${{ matrix.java-version }}
           cache: maven
           distribution: 'adopt'
 
