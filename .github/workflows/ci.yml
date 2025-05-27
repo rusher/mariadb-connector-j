@@ -12,9 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  TEST_DB_HOST: localhost
+  TEST_DB_HOST: mariadb.example.com
   TEST_DB_PORT: 3306
-  TEST_DB_USER: boby
+  TEST_DB_USER: root
   TEST_DB_PASSWORD: 'heyPassw-!*20oRd'
   TEST_DB_DATABASE: testj
 
@@ -34,7 +34,7 @@ jobs:
             if: github.event_name != 'pull_request'
     steps:
       - uses: actions/checkout@v4
-      
+      - run: echo "127.0.0.1 mariadb.example.com" | sudo tee -a /etc/hosts
       - uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java_version }}
@@ -46,8 +46,6 @@ jobs:
         with:
           tag: ${{ matrix.tag }}
           root-password: ${{ env.TEST_DB_PASSWORD }}
-          user: ${{ env.TEST_DB_USER }}
-          password: ${{ env.TEST_DB_PASSWORD }}
           database: ${{ env.TEST_DB_DATABASE }}
           registry: ${{ matrix.type == 'enterprise' && 'docker.mariadb.com/enterprise-server' || '' }}
           registry-user: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_USER || '' }}
@@ -89,7 +87,7 @@ jobs:
             java_version: '21'
     steps:
       - uses: actions/checkout@v4
-      
+      - run: echo "127.0.0.1 mariadb.example.com" | sudo tee -a /etc/hosts
       - uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java_version }}
@@ -102,8 +100,6 @@ jobs:
         with:
           tag: ${{ matrix.tag }}
           root-password: ${{ env.TEST_DB_PASSWORD }}
-          user: ${{ env.TEST_DB_USER }}
-          password: ${{ env.TEST_DB_PASSWORD }}
           database: ${{ env.TEST_DB_DATABASE }}
           registry: ${{ matrix.type == 'enterprise' && 'docker.mariadb.com/enterprise-server' || '' }}
           registry-user: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_USER || '' }}
@@ -116,8 +112,6 @@ jobs:
           mysql version: ${{ matrix.tag }}
           mysql database: ${{ env.TEST_DB_DATABASE }}
           mysql root password: ${{ env.TEST_DB_PASSWORD }}
-          mysql user: ${{ env.TEST_DB_USER }}
-          mysql password: ${{ env.TEST_DB_PASSWORD }}
 
       - name: Run Tests
         run: mvn clean test ${{ matrix.mvn_profile && format('-P {0}', matrix.mvn_profile) || '' }}
