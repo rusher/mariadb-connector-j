@@ -24,10 +24,24 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        type: ['community', 'enterprise']
+        type: ['community']
+        include:
+          - os: ubuntu-latest
+            type: 'enterprise'
+          - os: windows-latest
+            type: 'enterprise'
+          - os: macos-latest
+            type: 'enterprise'
         exclude:
-          - type: 'enterprise'
-            if: github.event_name == 'pull_request'
+          - os: ubuntu-latest
+            type: 'enterprise'
+            if: ${{ github.event_name == 'pull_request' }}
+          - os: windows-latest
+            type: 'enterprise'
+            if: ${{ github.event_name == 'pull_request' }}
+          - os: macos-latest
+            type: 'enterprise'
+            if: ${{ github.event_name == 'pull_request' }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -59,6 +73,7 @@ jobs:
         run: mvn clean test
         env:
           TEST_DB_PASSWORD: ${{ runner.os == 'Windows' && '' || env.TEST_DB_PASSWORD }}
+
   full-test:
     timeout-minutes: 50
     runs-on: ubuntu-latest
@@ -81,20 +96,20 @@ jobs:
             tag: '11.4'
             java: '17'
           - type: 'enterprise'
+            if: github.event_name == 'pull_request'
             tag: '10.5'
             java: '21'
           - type: 'enterprise'
+            if: github.event_name == 'pull_request'
             tag: '11.4'
             java: '21'
           - type: 'mysql'
             tag: '8.0'
             java: '21'
-        exclude:
-          - type: 'enterprise'
-            if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
       - run: echo "127.0.0.1 mariadb.example.com" | sudo tee -a /etc/hosts
+      
       - uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
@@ -111,7 +126,6 @@ jobs:
           registry: ${{ matrix.type == 'enterprise' && 'docker.mariadb.com/enterprise-server' || '' }}
           registry-user: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_USER || '' }}
           registry-password: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_TOKEN || '' }}
-          additional-conf: ${{ matrix.additional-conf }}
 
       - name: Setup MySQL
         if: matrix.type == 'mysql'
