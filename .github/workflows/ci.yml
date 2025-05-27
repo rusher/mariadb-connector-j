@@ -86,8 +86,8 @@ jobs:
           user: "TEST_DB_USER"
           password: "$TEST_DB_PASSWORD"
           database: "TEST_DB_DATABASE"
-          registry-user: ${{ registry-user }}
-          registry-password: ${{ registry-password }}
+          registry-user: ${{ matrix.registry-user }}
+          registry-password: ${{ matrix.registry-password }}
 
       - name: Build with Maven java 8
         if: matrix.mvn-profile == 'java8'
