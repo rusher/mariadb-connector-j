@@ -21,16 +21,18 @@ env:
 jobs:
   initial-test:
     timeout-minutes: 50
-    runs-on: [ubuntu-latest,windows-latest,macos-latest]
+    runs-on: ubuntu-latest
     strategy:
       matrix:
+        java_version: ['21']
+        tag: ['10.6']
         include:
           - type: 'community'
-            tag: '10.6'
-            java_version: '21'
+          - type: 'community'
+            os: windows-latest
+          - type: 'community'
+            os: macos-latest
           - type: 'enterprise'
-            tag: '10.6'
-            java_version: '21'
             if: github.event_name != 'pull_request'
     steps:
       - uses: actions/checkout@v4
@@ -67,6 +69,7 @@ jobs:
           - type: 'community'
             tag: '10.11'
             java_version: '21'
+            additional-conf: '--max_allowed_packet=40M --innodb_log_file_size=400M'
           - type: 'community'
             tag: '11.4'
             java_version: '8'
@@ -104,6 +107,7 @@ jobs:
           registry: ${{ matrix.type == 'enterprise' && 'docker.mariadb.com/enterprise-server' || '' }}
           registry-user: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_USER || '' }}
           registry-password: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_TOKEN || '' }}
+          additional-conf: ${{ matrix.additional-conf }}
 
       - name: Setup MySQL
         if: matrix.type == 'mysql'
