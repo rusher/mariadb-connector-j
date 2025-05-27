@@ -27,14 +27,13 @@ jobs:
   test:
     timeout-minutes: 50
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ env.WORKDIR }}
+#    defaults:
+#      run:
+#        working-directory: ${{ env.WORKDIR }}
     strategy:
       matrix:
         java-version: ['21']
         registry: ['docker.io/mariadb']
-        tag: '11.4'
         include:
           - tag: '10.5'
           - tag: '10.6'
