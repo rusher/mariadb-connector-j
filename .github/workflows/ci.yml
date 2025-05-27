@@ -58,15 +58,17 @@ jobs:
       - uses: actions/checkout@v4
 
       - run: |
-          export registry=$([ "$matrix_type" = "community" ] && echo "docker.io/mariadb" || echo "docker.mariadb.com/enterprise-server")
-        env:
-          matrix_type: ${{ matrix.type }}
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java_version }}
           cache: maven
           distribution: 'adopt'
+
+      - name: Set env
+        run: echo "registry=$(matrix_type == 'community'  && echo 'docker.io/mariadb' || echo 'docker.mariadb.com/enterprise-server')" >> $GITHUB_ENV
+        env:
+          matrix_type: ${{ matrix.type }}
 
       - name: Set up MariaDB Server
         if: ${{ matrix.type != 'mysql' }}
