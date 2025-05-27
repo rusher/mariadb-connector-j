@@ -77,7 +77,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Set up MariaDB Server
-        if: {{ mysql != true}}
+        if: {{ matrix.mysql != true}}
         uses: rusher/setup-mariadb@v1
         with:
           tag : ${{ matrix.tag }}
