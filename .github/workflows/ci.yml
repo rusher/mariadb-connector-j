@@ -66,9 +66,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Set env
-        run: echo "registry=$(matrix_type == 'community'  && echo 'docker.io/mariadb' || echo 'docker.mariadb.com/enterprise-server')" >> $GITHUB_ENV
-        env:
-          matrix_type: ${{ matrix.type }}
+        run: echo "registry=$([ "${{ matrix.type }}" = "community" ] && echo "docker.io/mariadb" || echo "docker.mariadb.com/enterprise-server")" >> $GITHUB_ENV
 
       - name: Set up MariaDB Server
         if: ${{ matrix.type != 'mysql' }}
