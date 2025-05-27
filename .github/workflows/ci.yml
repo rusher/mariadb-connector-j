@@ -96,12 +96,22 @@ jobs:
         with:
           tag : ${{ matrix.tag }}
           registry: ${{ env.registry }}
-          root-password: "$TEST_DB_PASSWORD"
-          user: "TEST_DB_USER"
-          password: "$TEST_DB_PASSWORD"
-          database: "TEST_DB_DATABASE"
+          root-password: ${{ env.TEST_DB_PASSWORD }}
+          user: ${{ env.TEST_DB_USER }}
+          password: ${{ env.TEST_DB_PASSWORD }}
+          database: ${{ env.TEST_DB_DATABASE }}
           registry-user: ${{ matrix.registry_user }}
           registry-password: ${{ matrix.registry_password }}
+
+      - name: Set up MySQL Server
+        if: ${{ matrix.type == 'mysql' }}
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql version: ${{ matrix.tag }}
+          mysql database: ${{ env.TEST_DB_DATABASE }}
+          mysql root password:  ${{ env.TEST_DB_PASSWORD }}
+          mysql user: ${{ matrix.registry_user }}
+          mysql password:  ${{ env.TEST_DB_PASSWORD }}
 
       - name: Build with Maven java 8
         if: matrix.mvn_profile == 'java8'
