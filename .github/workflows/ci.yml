@@ -21,7 +21,7 @@ env:
 jobs:
   initial-test:
     timeout-minutes: 50
-    runs-on: ubuntu-latest
+    runs-on: [ubuntu-latest,windows-latest,macos-latest]
     strategy:
       matrix:
         include:

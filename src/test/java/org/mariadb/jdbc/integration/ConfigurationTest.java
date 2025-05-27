@@ -175,7 +175,7 @@ public class ConfigurationTest extends Common {
         // could be different, because charset default might differ from server default
         assertTrue(
             rs.getString(2).equals(rs.getString(1))
-                || "utf8mb4_unicode_ci".equals(rs.getString(1)));
+                || "utf8mb4_unicode_ci".equals(rs.getString(1)), "collation was " + rs.getString(1));
       }
     }
 
