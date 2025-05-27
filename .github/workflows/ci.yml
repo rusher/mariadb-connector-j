@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java-version: ['21']
+        java_version: ['21']
         type: ['community']
         include:
           - tag: '10.5'
