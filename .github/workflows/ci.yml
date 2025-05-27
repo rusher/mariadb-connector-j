@@ -46,22 +46,22 @@ jobs:
             tag: '10.5'
             java_version: '21'
             if: github.event_name != 'pull_request'
-            registry_user: secrets.ENTERPRISE_USER
-            registry_password: secrets.ENTERPRISE_TOKEN
+            registry_user: ${{ secrets.ENTERPRISE_USER }}
+            registry_password: ${{ secrets.ENTERPRISE_TOKEN }}
 
           - type: 'enterprise'
             tag: '10.6'
             java_version: '21'
             if: github.event_name != 'pull_request'
-            registry_user: secrets.ENTERPRISE_USER
-            registry_password: secrets.ENTERPRISE_TOKEN
+            registry_user: ${{ secrets.ENTERPRISE_USER }}
+            registry_password: ${{ secrets.ENTERPRISE_TOKEN }}
 
           - type: 'enterprise'
             tag: '11.4'
             java_version: '21'
             if: github.event_name != 'pull_request'
-            registry_user: secrets.ENTERPRISE_USER
-            registry_password: secrets.ENTERPRISE_TOKEN
+            registry_user: ${{ secrets.ENTERPRISE_USER }}
+            registry_password: ${{ secrets.ENTERPRISE_TOKEN }}
 
           - type: 'mysql'
             tag: '8.0'
