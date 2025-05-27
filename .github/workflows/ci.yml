@@ -21,47 +21,44 @@ env:
 jobs:
   initial-test:
     timeout-minutes: 50
-    runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - type: 'community'
-            java_version: '21'
-            tag: '10.6'
-          - type: 'community'
-            java_version: '21'
-            tag: '10.6'
-            os: windows-latest
-          - type: 'community'
-            java_version: '21'
-            tag: '10.6'
-            os: macos-latest
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        type: ['community', 'enterprise']
+        exclude:
           - type: 'enterprise'
-            java_version: '21'
-            tag: '10.6'
-            if: github.event_name != 'pull_request'
+            if: github.event_name == 'pull_request'
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - run: echo "127.0.0.1 mariadb.example.com" | sudo tee -a /etc/hosts
+      
       - uses: actions/setup-java@v4
         with:
-          java-version: ${{ matrix.java_version }}
+          java-version: '21'
           cache: maven
           distribution: 'adopt'
 
-      - name: Setup Database
+      - name: Setup Database (Linux/macOS)
+        if: runner.os != 'Windows'
         uses: rusher/setup-mariadb@v1.9
         with:
-          tag: ${{ matrix.tag }}
+          tag: '10.6'
           root-password: ${{ env.TEST_DB_PASSWORD }}
           database: ${{ env.TEST_DB_DATABASE }}
           registry: ${{ matrix.type == 'enterprise' && 'docker.mariadb.com/enterprise-server' || '' }}
           registry-user: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_USER || '' }}
           registry-password: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_TOKEN || '' }}
 
+      - name: Setup Database (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install mariadb --version=10.6.19
+          mysql -u root -e "CREATE DATABASE IF NOT EXISTS ${{ env.TEST_DB_DATABASE }};"
+
       - name: Run Tests
         run: mvn clean test
-
+        env:
+          TEST_DB_PASSWORD: ${{ runner.os == 'Windows' && '' || env.TEST_DB_PASSWORD }}
   full-test:
     timeout-minutes: 50
     runs-on: ubuntu-latest
@@ -71,35 +68,36 @@ jobs:
         include:
           - type: 'community'
             tag: '10.5'
-            java_version: '21'
+            java: '21'
           - type: 'community'
             tag: '10.11'
-            java_version: '21'
+            java: '21'
             additional-conf: '--max_allowed_packet=40M --innodb_log_file_size=400M'
           - type: 'community'
             tag: '11.4'
-            java_version: '8'
-            mvn_profile: 'java8'
+            java: '8'
+            profile: 'java8'
           - type: 'community'
             tag: '11.4'
-            java_version: '17'
+            java: '17'
           - type: 'enterprise'
             tag: '10.5'
-            java_version: '21'
-            if: github.event_name != 'pull_request'
+            java: '21'
           - type: 'enterprise'
             tag: '11.4'
-            java_version: '21'
-            if: github.event_name != 'pull_request'
+            java: '21'
           - type: 'mysql'
             tag: '8.0'
-            java_version: '21'
+            java: '21'
+        exclude:
+          - type: 'enterprise'
+            if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
       - run: echo "127.0.0.1 mariadb.example.com" | sudo tee -a /etc/hosts
       - uses: actions/setup-java@v4
         with:
-          java-version: ${{ matrix.java_version }}
+          java-version: ${{ matrix.java }}
           cache: maven
           distribution: 'adopt'
 
@@ -124,4 +122,4 @@ jobs:
           mysql root password: ${{ env.TEST_DB_PASSWORD }}
 
       - name: Run Tests
-        run: mvn clean test ${{ matrix.mvn_profile && format('-P {0}', matrix.mvn_profile) || '' }}
+        run: mvn clean test ${{ matrix.profile && format('-P {0}', matrix.profile) || '' }}
