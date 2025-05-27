@@ -24,15 +24,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java_version: ['21']
-        tag: ['10.6']
         include:
           - type: 'community'
+            java_version: '21'
+            tag: '10.6'
           - type: 'community'
+            java_version: '21'
+            tag: '10.6'
             os: windows-latest
           - type: 'community'
+            java_version: '21'
+            tag: '10.6'
             os: macos-latest
           - type: 'enterprise'
+            java_version: '21'
+            tag: '10.6'
             if: github.event_name != 'pull_request'
     steps:
       - uses: actions/checkout@v4
