@@ -73,7 +73,7 @@ jobs:
         uses: rusher/setup-mariadb@v1
         with:
           tag : ${{ matrix.tag }}
-          registry: ${{ registry }}
+          registry: ${{ env.registry }}
           root-password: "$TEST_DB_PASSWORD"
           user: "TEST_DB_USER"
           password: "$TEST_DB_PASSWORD"
