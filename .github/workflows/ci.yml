@@ -57,7 +57,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: |
+      - name: Set env
+        run: echo "java_version:${{ matrix.java_version }}"
+
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
