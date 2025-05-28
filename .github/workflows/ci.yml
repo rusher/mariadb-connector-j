@@ -32,7 +32,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - run: echo "127.0.0.1 ${TEST_DB_HOST}" | sudo tee -a /etc/hosts
+      - name: Add hosts entry (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: echo "127.0.0.1 ${TEST_DB_HOST}" | sudo tee -a /etc/hosts
+
+      - name: Add hosts entry (Windows)
+        if: runner.os == 'Windows'
+        run: echo "127.0.0.1 ${env:TEST_DB_HOST}" | Out-File -FilePath C:\Windows\System32\drivers\etc\hosts -Append -Encoding ascii
 
       - uses: actions/setup-java@v4
         with:
@@ -97,7 +103,13 @@ jobs:
             java: '21'
     steps:
       - uses: actions/checkout@v4
-      - run: echo "127.0.0.1 ${TEST_DB_HOST}" | sudo tee -a /etc/hosts
+      - name: Add hosts entry (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: echo "127.0.0.1 ${TEST_DB_HOST}" | sudo tee -a /etc/hosts
+
+      - name: Add hosts entry (Windows)
+        if: runner.os == 'Windows'
+        run: echo "127.0.0.1 ${env:TEST_DB_HOST}" | Out-File -FilePath C:\Windows\System32\drivers\etc\hosts -Append -Encoding ascii
       
       - uses: actions/setup-java@v4
         with:
