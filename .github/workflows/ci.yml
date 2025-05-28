@@ -41,7 +41,7 @@ jobs:
 
       - name: Setup Database (Linux/macOS)
         if: runner.os != 'Windows'
-        uses: rusher/setup-mariadb@v1.13
+        uses: rusher/setup-mariadb@v1.14
         with:
           tag: '10.6'
           root-password: ${{ env.TEST_DB_PASSWORD }}
@@ -106,7 +106,7 @@ jobs:
 
       - name: Setup MariaDB
         if: matrix.type != 'mysql'
-        uses: rusher/setup-mariadb@v1.13
+        uses: rusher/setup-mariadb@v1.14
         with:
           tag: ${{ matrix.tag }}
           root-password: ${{ env.TEST_DB_PASSWORD }}
