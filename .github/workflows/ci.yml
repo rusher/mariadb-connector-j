@@ -47,7 +47,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Setup Database
-        uses: rusher/setup-mariadb@v1.18
+        uses: rusher/setup-mariadb@v1.19
         with:
           tag: '10.6'
           root-password: ${{ env.TEST_DB_PASSWORD }}
@@ -110,7 +110,7 @@ jobs:
 
       - name: Setup MariaDB
         if: matrix.type != 'mysql'
-        uses: rusher/setup-mariadb@v1.18
+        uses: rusher/setup-mariadb@v1.19
         with:
           tag: ${{ matrix.tag }}
           root-password: ${{ env.TEST_DB_PASSWORD }}
