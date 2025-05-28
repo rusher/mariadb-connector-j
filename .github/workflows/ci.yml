@@ -46,8 +46,7 @@ jobs:
           cache: maven
           distribution: 'adopt'
 
-      - name: Setup Database (Linux/macOS)
-        if: runner.os != 'Windows'
+      - name: Setup Database
         uses: rusher/setup-mariadb@v1.17
         with:
           tag: '10.6'
@@ -57,16 +56,8 @@ jobs:
           registry-user: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_USER || '' }}
           registry-password: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_TOKEN || '' }}
 
-      - name: Setup Database (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          choco install mariadb --version=10.6.19
-          mysql -u root -e "CREATE DATABASE IF NOT EXISTS ${{ env.TEST_DB_DATABASE }};"
-
       - name: Run Tests
         run: mvn clean test
-        env:
-          TEST_DB_PASSWORD: ${{ runner.os == 'Windows' && '' || env.TEST_DB_PASSWORD }}
 
   full-test:
     timeout-minutes: 50
