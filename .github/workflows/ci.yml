@@ -41,7 +41,7 @@ jobs:
 
       - name: Setup Database (Linux/macOS)
         if: runner.os != 'Windows'
-        uses: rusher/setup-mariadb@v1.12
+        uses: rusher/setup-mariadb@v1.13
         with:
           tag: '10.6'
           root-password: ${{ env.TEST_DB_PASSWORD }}
@@ -79,6 +79,7 @@ jobs:
             tag: '11.4'
             java: '8'
             profile: 'java8'
+            local: 1
           - type: 'community'
             tag: '11.4'
             java: '17'
@@ -105,7 +106,7 @@ jobs:
 
       - name: Setup MariaDB
         if: matrix.type != 'mysql'
-        uses: rusher/setup-mariadb@v1.12
+        uses: rusher/setup-mariadb@v1.13
         with:
           tag: ${{ matrix.tag }}
           root-password: ${{ env.TEST_DB_PASSWORD }}
@@ -113,6 +114,7 @@ jobs:
           registry: ${{ matrix.type == 'enterprise' && 'docker.mariadb.com/enterprise-server' || '' }}
           registry-user: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_USER || '' }}
           registry-password: ${{ matrix.type == 'enterprise' && secrets.ENTERPRISE_TOKEN || '' }}
+          local: ${{ matrix.local }}
 
       - name: Setup MySQL
         if: matrix.type == 'mysql'
