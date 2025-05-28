@@ -28,13 +28,6 @@ jobs:
         include:
           - os: ubuntu-latest
             type: 'enterprise'
-          - os: windows-latest
-            type: 'enterprise'
-          - os: macos-latest
-            type: 'enterprise'
-        exclude:
-          - os: ubuntu-latest
-            type: 'enterprise'
             if: ${{ github.event_name == 'pull_request' }}
           - os: windows-latest
             type: 'enterprise'
