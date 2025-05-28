@@ -32,7 +32,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      
+      - run: echo "127.0.0.1 ${TEST_DB_HOST}" | sudo tee -a /etc/hosts
+
       - uses: actions/setup-java@v4
         with:
           java-version: '21'
@@ -96,7 +97,7 @@ jobs:
             java: '21'
     steps:
       - uses: actions/checkout@v4
-      - run: echo "127.0.0.1 mariadb.example.com" | sudo tee -a /etc/hosts
+      - run: echo "127.0.0.1 ${TEST_DB_HOST}" | sudo tee -a /etc/hosts
       
       - uses: actions/setup-java@v4
         with:
